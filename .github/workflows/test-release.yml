@@ -30,6 +30,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           repository: zoy-l/shibei-desktop
+          path: test-github
 
       - name: setup node
         uses: actions/setup-node@v1
