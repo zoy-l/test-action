@@ -80,7 +80,7 @@ jobs:
       - uses: zoy-l/tauri-build-action@main
         id: tauri_build
         env:
-          ENV_API_URL: https://test-api.shibei.chat
+          ENV_API_URL: ${{ secrets.API_URL }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ''
         with:
@@ -153,20 +153,19 @@ jobs:
             "platforms": {
               "darwin-x86_64": {
                 "signature": "${{ steps.sig-contents.outputs.app-sig-content }}",
-                "url": "https://shibei-file.oss-cn-hangzhou.aliyuncs.com/tauri/${{ steps.extract-version.outputs.version }}/shibei.app.tar.gz"
+                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/shibei.app.tar.gz"
               },
               "darwin-aarch64": {
                 "signature": "${{ steps.sig-contents.outputs.app-sig-content }}",
-                "url": "https://shibei-file.oss-cn-hangzhou.aliyuncs.com/tauri/${{ steps.extract-version.outputs.version }}/shibei.app.tar.gz"
+                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/shibei.app.tar.gz"
               },
               "linux-x86_64": {
                 "signature": "${{ steps.sig-contents.outputs.appimage-sig-content }}",
-                "url": "https://shibei-file.oss-cn-hangzhou.aliyuncs.com/tauri/${{ steps.extract-version.outputs.version }}/shibei_${{ steps.extract-version.outputs.version }}_amd64.AppImage.tar.gz"
+                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/shibei_${{ steps.extract-version.outputs.version }}_amd64.AppImage.tar.gz"
               },
               "windows-x86_64": {
                 "signature": "${{ steps.sig-contents.outputs.msi-sig-content }}",
-                "url": "https://shibei-file.oss-cn-hangzhou.aliyuncs.com/tauri/${{ steps.extract-version.outputs.version }}/shibei_${{ steps.extract-version.outputs.version }}_x64_en-US.msi.zip
-                "
+                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/shibei_${{ steps.extract-version.outputs.version }}_x64_en-US.msi.zip"
               }
             }
           }' > ./artifacts/install.json
