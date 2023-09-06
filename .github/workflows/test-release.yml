@@ -28,12 +28,8 @@ jobs:
     runs-on: ${{ matrix.platform.os }}
     steps:
       - uses: actions/checkout@v2
-
-      - name: Clone another repository
-        run: |
-          git config --global user.name "${{ github.event.pusher.name }}"
-          git config --global user.email "${{ github.event.pusher.email }}"
-          git clone https://github.com/mobiuslab/shibei-desktop.git
+        with:
+          repository: zoy-l/shibei-desktop
 
       - name: setup node
         uses: actions/setup-node@v1
