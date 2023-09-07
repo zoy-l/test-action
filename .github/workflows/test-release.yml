@@ -125,7 +125,7 @@ jobs:
 
       - name: Generate Timer
         id: current-time
-        run: echo "::set-output name=current-time::$(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S')"
+        run: echo "::set-output name=timestamp::$(TZ=Asia/Shanghai date -u +'%Y-%m-%dT%H:%M:%SZ')"
 
       - name: Generate release tag
         id: tag
@@ -135,9 +135,9 @@ jobs:
       - name: Cat Signature Contents
         id: sig-contents
         run: |
-          MSI_SIG_CONTENT="$(cat ./artifacts/*.msi.zip.sig 2>/dev/null || echo '')"
-          APP_SIG_CONTENT="$(cat ./artifacts/*.app.tar.gz.sig 2>/dev/null || echo '')"
-          APPIMAGE_SIG_CONTENT="$(cat ./artifacts/*.AppImage.tar.gz.sig 2>/dev/null || echo '')"
+          MSI_SIG_CONTENT="$(cat ./artifacts/**/*.msi.zip.sig 2>/dev/null || echo '')"
+          APP_SIG_CONTENT="$(cat ./artifacts/**/*.app.tar.gz.sig 2>/dev/null || echo '')"
+          APPIMAGE_SIG_CONTENT="$(cat ./artifacts/**/*.AppImage.tar.gz.sig 2>/dev/null || echo '')"
 
           echo "::set-output name=msi-sig-content::$MSI_SIG_CONTENT"
           echo "::set-output name=app-sig-content::$APP_SIG_CONTENT"
@@ -183,7 +183,10 @@ jobs:
         uses: softprops/action-gh-release@master
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          GITHUB_REPOSITORY: zoy-l/shibei-desktop
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
           draft: false
           files: ./artifacts/**/*
+          token: ${{ secrets.ACB }}
+
