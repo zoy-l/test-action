@@ -146,6 +146,7 @@ jobs:
 
       - name: Generate Install JSON File
         run: |
+          mkdir -p ./artifacts/${{ steps.extract-version.outputs.version }}
           echo '{
             "version": "${{ steps.extract-version.outputs.version }}",
             "notes": "发现新版本",
@@ -173,7 +174,6 @@ jobs:
 
       - name: Archive Artifacts
         run: |
-          mkdir -p ./artifacts/${{ steps.extract-version.outputs.version }}
           mv ./artifacts/**/* ./artifacts/${{ steps.extract-version.outputs.version }}/
           zip -r bundles.zip ./artifacts/${{ steps.extract-version.outputs.version }}
           mv ./bundles.zip ./artifacts/${{ steps.extract-version.outputs.version }}/bundles.zip
