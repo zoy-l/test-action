@@ -81,6 +81,7 @@ jobs:
         id: tauri_build
         env:
           ENV_API_URL: ${{ secrets.API_URL }}
+          ENV_CHAT_URL: ${{ secrets.ENV_CHAT_URL }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ''
         with:
@@ -156,11 +157,11 @@ jobs:
               },
               "linux-x86_64": {
                 "signature": "${{ steps.sig-contents.outputs.appimage-sig-content }}",
-                "url": "${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/十贝_${{ steps.extract-version.outputs.version }}_amd64.AppImage.tar.gz"
+                "url": "${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/十-贝_${{ steps.extract-version.outputs.version }}_amd64.AppImage.tar.gz"
               },
               "windows-x86_64": {
                 "signature": "${{ steps.sig-contents.outputs.msi-sig-content }}",
-                "url": "${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/十贝_${{ steps.extract-version.outputs.version }}_x64_en-US.msi.zip"
+                "url": "${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/十贝_${{ steps.extract-version.outputs.version }}_x64_zh-CN.msi.zip"
               }
             }
           }' > ./artifacts/install.json
