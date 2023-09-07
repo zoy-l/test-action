@@ -37,9 +37,15 @@ jobs:
         env:
           INSTALL_URL:
         run: |
-          replace_str='${{ secrets.OSS_URL }}/test-tauri/install.json'
-          sed -i "s/__install_url__/${replace_str}/g" "src-tauri/tauri.conf.json"
-          echo "Modified successfully."
+          node -e "`
+          const fs = require('fs');
+          const path = require('path');
+          const filePath = path.join('src-tauri', 'tauri.conf.json');
+          let fileContent = fs.readFileSync(filePath, 'utf-8');
+          const newInstallUrl = '${{ secrets.OSS_URL }}/test-tauri/install.json';
+          fileContent = fileContent.replace(/__install_url__/g, newInstallUrl);
+          fs.writeFileSync(filePath, fileContent, 'utf-8');
+          `"
           cat "src-tauri/tauri.conf.json"
         working-directory: ${{ github.workspace }}
 
