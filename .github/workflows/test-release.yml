@@ -146,7 +146,6 @@ jobs:
 
       - name: Generate Install JSON File
         run: |
-          mkdir -p ./artifacts/${{ steps.extract-version.outputs.version }}
           echo '{
             "version": "${{ steps.extract-version.outputs.version }}",
             "notes": "发现新版本",
@@ -169,11 +168,13 @@ jobs:
                 "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/shibei_${{ steps.extract-version.outputs.version }}_x64_en-US.msi.zip"
               }
             }
-          }' > ./artifacts/${{ steps.extract-version.outputs.version }}/install.json
+          }' > ./install.json
         working-directory: ${{ github.workspace }}
 
       - name: Archive Artifacts
         run: |
+          mkdir -p ./artifacts/${{ steps.extract-version.outputs.version }}
+          mv ./install.json ./artifacts/${{ steps.extract-version.outputs.version }}/install.json
           mv ./artifacts/**/* ./artifacts/${{ steps.extract-version.outputs.version }}/
           zip -r bundles.zip ./artifacts/${{ steps.extract-version.outputs.version }}
           mv ./bundles.zip ./artifacts/${{ steps.extract-version.outputs.version }}/bundles.zip
