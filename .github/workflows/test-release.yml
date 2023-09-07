@@ -168,13 +168,12 @@ jobs:
                 "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/shibei_${{ steps.extract-version.outputs.version }}_x64_en-US.msi.zip"
               }
             }
-          }' > ./install.json
+          }' > ./artifacts/install.json
         working-directory: ${{ github.workspace }}
 
       - name: Archive Artifacts
         run: |
           mkdir -p ./artifacts/${{ steps.extract-version.outputs.version }}
-          mv ./install.json ./artifacts/${{ steps.extract-version.outputs.version }}/install.json
           mv ./artifacts/**/* ./artifacts/${{ steps.extract-version.outputs.version }}/
           zip -r bundles.zip ./artifacts/${{ steps.extract-version.outputs.version }}
           mv ./bundles.zip ./artifacts/${{ steps.extract-version.outputs.version }}/bundles.zip
