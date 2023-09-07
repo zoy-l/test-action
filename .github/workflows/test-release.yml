@@ -195,6 +195,6 @@ jobs:
           ACCESS_KEY_ID: ${{ secrets.OSS_KEY }}
           ACCESS_KEY_SECRET: ${{ secrets.OSS_KEY_SECRET }}
         run: |
-          ossutil cp -r ./artifacts/install.json oss://shibei-file/tauri
-          ossutil cp -r ./artifacts/${{ steps.extract-version.outputs.version }}/ oss://shibei-file/tauri
+          ossutil cp -r ./artifacts/install.json oss://shibei-file/tauri --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou
+          ossutil cp -r ./artifacts/${{ steps.extract-version.outputs.version }}/ oss://shibei-file/tauri --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou
 
