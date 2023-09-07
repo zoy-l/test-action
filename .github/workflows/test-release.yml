@@ -171,14 +171,25 @@ jobs:
           mkdir -p ./artifacts/${{ steps.extract-version.outputs.version }}
           mv ./artifacts/**/* ./artifacts/${{ steps.extract-version.outputs.version }}/
           zip -r bundles.zip ./artifacts/${{ steps.extract-version.outputs.version }}
-          mv ./bundles.zip ./artifacts/${{ steps.extract-version.outputs.version }}/bundles.zip
+          mv ./bundles.zip ./artifacts/bundles.zip
         working-directory: ${{ github.workspace }}
 
-      - name: 'create release'
-        uses: softprops/action-gh-release@master
-        env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+      # - name: 'create release'
+      #   uses: softprops/action-gh-release@master
+      #   env:
+      #     GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+      #   with:
+      #     tag_name: ${{ steps.tag.outputs.release_tag }}
+      #     draft: false
+      #     files: |
+      #       ./artifacts/${{ steps.extract-version.outputs.version }}/bundles.zip
+      #       ./artifacts/install.json
+
+      - uses: manyuanrong/setup-ossutil@v1.0
         with:
-          tag_name: ${{ steps.tag.outputs.release_tag }}
-          draft: false
-          files: ./artifacts/**/*
+          endpoint: "oss-cn-hangzhou"
+          access-key-id: ${{ secrets.OSS_KEY }}
+          access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
+      - run: ossutil cp -r ./artifacts/install.json oss://shibei-file/tauri
+      - run: ossutil cp -r ./artifacts/${{ steps.extract-version.outputs.version }}/ oss://shibei-file/tauri
+
