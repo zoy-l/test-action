@@ -80,8 +80,8 @@ jobs:
       - uses: zoy-l/tauri-build-action@main
         id: tauri_build
         env:
-          ENV_API_URL: ${{ secrets.API_URL }}
-          ENV_CHAT_URL: ${{ secrets.ENV_CHAT_URL }}
+          ENV_API_URL: ${{ secrets.PROD_API_URL }}
+          ENV_CHAT_URL: ${{ secrets.PROD_ENV_CHAT_URL }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ''
         with:
