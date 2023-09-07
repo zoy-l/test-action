@@ -74,13 +74,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - name: Modify tauri.conf.json
-        env:
-          INSTALL_URL: ${{ secrets.OSS_URL }}
-        run: |
-          node install.cjs
-        working-directory: ${{ github.workspace }}
-
       - name: Setup install
         run: pnpm install --frozen-lockfile
 
@@ -189,6 +182,6 @@ jobs:
           ACCESS_KEY_ID: ${{ secrets.OSS_KEY }}
           ACCESS_KEY_SECRET: ${{ secrets.OSS_KEY_SECRET }}
         run: |
-          ossutil cp ./artifacts/install.json oss://shibei-file/test-tauri/install.json --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com
-          ossutil cp -r ./artifacts/${{ steps.extract-version.outputs.version }}/ oss://shibei-file/test-tauri/${{ steps.extract-version.outputs.version }}/ --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com
+          ossutil cp ./artifacts/install.json oss://shibei-file/test-tauri/install.json --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com -f
+          ossutil cp -r ./artifacts/${{ steps.extract-version.outputs.version }}/ oss://shibei-file/test-tauri/${{ steps.extract-version.outputs.version }}/ --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com -f
 
