@@ -168,35 +168,22 @@ jobs:
                 "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/shibei_${{ steps.extract-version.outputs.version }}_x64_en-US.msi.zip"
               }
             }
-          }' > ./install.json
+          }' > ./artifacts/${{ steps.extract-version.outputs.version }}/install.json
         working-directory: ${{ github.workspace }}
 
-      # - name: Archive Artifacts
-      #   run: |
-      #     mkdir -p ./artifacts/${{ steps.extract-version.outputs.version }}
-      #     mv ./artifacts/**/* ./artifacts/${{ steps.extract-version.outputs.version }}/
-      #     zip -r bundles.zip ./artifacts/${{ steps.extract-version.outputs.version }}
-      #     mv ./bundles.zip ./artifacts/${{ steps.extract-version.outputs.version }}/bundles.zip
-      #   working-directory: ${{ github.workspace }}
+      - name: Archive Artifacts
+        run: |
+          mkdir -p ./artifacts/${{ steps.extract-version.outputs.version }}
+          mv ./artifacts/**/* ./artifacts/${{ steps.extract-version.outputs.version }}/
+          zip -r bundles.zip ./artifacts/${{ steps.extract-version.outputs.version }}
+          mv ./bundles.zip ./artifacts/${{ steps.extract-version.outputs.version }}/bundles.zip
+        working-directory: ${{ github.workspace }}
 
-
-      - name: Upload to oss
-        id: upload_to_oss
-        uses: tvrcgo/upload-to-oss@master
+      - name: 'create release'
+        uses: softprops/action-gh-release@master
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
         with:
-          key-id: ${{ secrets.OSS_KEY }}
-          key-secret: ${{ secrets.OSS_KEY_SECRET }}
-          region: oss-cn-hangzhou
-          bucket: ${{ secrets.OSS_BK }}
-          assets: |
-            ./install.json:/tauri/
-            ./artifacts/**/*:/tauri/${{ steps.extract-version.outputs.version }}/
-
-      # - name: 'create release'
-      #   uses: softprops/action-gh-release@master
-      #   env:
-      #     GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-      #   with:
-      #     tag_name: ${{ steps.tag.outputs.release_tag }}
-      #     draft: false
-      #     files: ./artifacts/**/*
+          tag_name: ${{ steps.tag.outputs.release_tag }}
+          draft: false
+          files: ./artifacts/**/*
