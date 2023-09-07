@@ -80,7 +80,8 @@ jobs:
       - uses: zoy-l/tauri-build-action@main
         id: tauri_build
         env:
-          ENV_API_URL: ${{ secrets.API_URL_PROD }}
+          ENV_API_URL: ${{ secrets.API_URL }}
+          ENV_CHAT_URL: ${{ secrets.ENV_CHAT_URL }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ''
         with:
@@ -102,7 +103,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           repository: zoy-l/shibei-desktop
-          ref: test-github
+          ref: main-github
           token: ${{ secrets.ACB }}
 
       - name: setup node
@@ -123,21 +124,17 @@ jobs:
           echo "::set-output name=version::$VERSION"
         working-directory: ${{ github.workspace }}
 
-      - name: Generate Timer
-        id: current-time
-        run: echo "::set-output name=current-time::$(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S')"
-
       - name: Generate release tag
         id: tag
         run: |
-          echo "::set-output name=release_tag::shibei_$(date +"%Y.%m.%d_%H-%M")"
+          echo "::set-output name=release_tag::shibei_$(TZ=Asia/Shanghai date +"%Y.%m.%d_%H-%M")"
 
       - name: Cat Signature Contents
         id: sig-contents
         run: |
-          MSI_SIG_CONTENT="$(cat ./artifacts/*.msi.zip.sig 2>/dev/null || echo '')"
-          APP_SIG_CONTENT="$(cat ./artifacts/*.app.tar.gz.sig 2>/dev/null || echo '')"
-          APPIMAGE_SIG_CONTENT="$(cat ./artifacts/*.AppImage.tar.gz.sig 2>/dev/null || echo '')"
+          MSI_SIG_CONTENT="$(cat ./artifacts/**/*.msi.zip.sig 2>/dev/null || echo '')"
+          APP_SIG_CONTENT="$(cat ./artifacts/**/*.app.tar.gz.sig 2>/dev/null || echo '')"
+          APPIMAGE_SIG_CONTENT="$(cat ./artifacts/**/*.AppImage.tar.gz.sig 2>/dev/null || echo '')"
 
           echo "::set-output name=msi-sig-content::$MSI_SIG_CONTENT"
           echo "::set-output name=app-sig-content::$APP_SIG_CONTENT"
@@ -146,44 +143,46 @@ jobs:
 
       - name: Generate Install JSON File
         run: |
-          mkdir -p ./artifacts/${{ steps.extract-version.outputs.version }}
           echo '{
             "version": "${{ steps.extract-version.outputs.version }}",
             "notes": "发现新版本",
-            "pub_date": "${{ steps.current-time.outputs.current-time }}",
             "platforms": {
               "darwin-x86_64": {
                 "signature": "${{ steps.sig-contents.outputs.app-sig-content }}",
-                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/shibei.app.tar.gz"
+                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/十贝.app.tar.gz"
               },
               "darwin-aarch64": {
                 "signature": "${{ steps.sig-contents.outputs.app-sig-content }}",
-                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/shibei.app.tar.gz"
+                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/十贝.app.tar.gz"
               },
               "linux-x86_64": {
                 "signature": "${{ steps.sig-contents.outputs.appimage-sig-content }}",
-                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/shibei_${{ steps.extract-version.outputs.version }}_amd64.AppImage.tar.gz"
+                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/十-贝_${{ steps.extract-version.outputs.version }}_amd64.AppImage.tar.gz"
               },
               "windows-x86_64": {
                 "signature": "${{ steps.sig-contents.outputs.msi-sig-content }}",
-                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/shibei_${{ steps.extract-version.outputs.version }}_x64_en-US.msi.zip"
+                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/十贝_${{ steps.extract-version.outputs.version }}_x64_zh-CN.msi.zip"
               }
             }
-          }' > ./artifacts/${{ steps.extract-version.outputs.version }}/install.json
+          }' > ./artifacts/install.json
         working-directory: ${{ github.workspace }}
 
       - name: Archive Artifacts
         run: |
+          mkdir -p ./artifacts/${{ steps.extract-version.outputs.version }}
           mv ./artifacts/**/* ./artifacts/${{ steps.extract-version.outputs.version }}/
-          zip -r bundles.zip ./artifacts/${{ steps.extract-version.outputs.version }}
-          mv ./bundles.zip ./artifacts/${{ steps.extract-version.outputs.version }}/bundles.zip
         working-directory: ${{ github.workspace }}
 
-      - name: 'create release'
-        uses: softprops/action-gh-release@master
+      - name: Install ossutil
+        run: |
+          curl -L https://gosspublic.alicdn.com/ossutil/1.7.16/ossutil64 -o /usr/local/bin/ossutil
+          chmod +x /usr/local/bin/ossutil
+
+      - name: Push oss
         env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-        with:
-          tag_name: ${{ steps.tag.outputs.release_tag }}
-          draft: false
-          files: ./artifacts/**/*
+          ACCESS_KEY_ID: ${{ secrets.OSS_KEY }}
+          ACCESS_KEY_SECRET: ${{ secrets.OSS_KEY_SECRET }}
+        run: |
+          ossutil cp ./artifacts/install.json oss://shibei-file/tauri/install.json --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com -f
+          ossutil cp -r ./artifacts/${{ steps.extract-version.outputs.version }}/ oss://shibei-file/tauri/${{ steps.extract-version.outputs.version }}/ --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com -f
+
