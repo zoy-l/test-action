@@ -123,14 +123,10 @@ jobs:
           echo "::set-output name=version::$VERSION"
         working-directory: ${{ github.workspace }}
 
-      - name: Generate Timer
-        id: current-time
-        run: echo "::set-output name=timestamp::$(TZ=Asia/Shanghai date -u +'%Y-%m-%dT%H:%M:%SZ')"
-
       - name: Generate release tag
         id: tag
         run: |
-          echo "::set-output name=release_tag::shibei_$(date +"%Y.%m.%d_%H-%M")"
+          echo "::set-output name=release_tag::shibei_$(TZ=Asia/Shanghai date +"%Y.%m.%d_%H-%M")"
 
       - name: Cat Signature Contents
         id: sig-contents
@@ -149,7 +145,6 @@ jobs:
           echo '{
             "version": "${{ steps.extract-version.outputs.version }}",
             "notes": "发现新版本",
-            "pub_date": "${{ steps.current-time.outputs.current-time }}",
             "platforms": {
               "darwin-x86_64": {
                 "signature": "${{ steps.sig-contents.outputs.app-sig-content }}",
