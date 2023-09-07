@@ -33,6 +33,16 @@ jobs:
           ref: test-github
           token: ${{ secrets.ACB }}
 
+      - name: Modify tauri.conf.json
+        env:
+          INSTALL_URL:
+        run: |
+          replace_str='${{ secrets.OSS_URL }}/test-tauri/install.json'
+          sed -i "s/__install_url__/${replace_str}/g" "src-tauri/tauri.conf.json"
+          echo "Modified successfully."
+          cat "src-tauri/tauri.conf.json"
+        working-directory: ${{ github.workspace }}
+
       - name: setup node
         uses: actions/setup-node@v1
         with:
@@ -73,13 +83,6 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-
-      - name: Modify tauri.conf.json
-        env:
-          INSTALL_URL: ${{ secrets.OSS_URL }}/test-tauri/install.json
-        run: |
-          node install.cjs
-        working-directory: ${{ github.workspace }}
 
       - name: Setup install
         run: pnpm install --frozen-lockfile
