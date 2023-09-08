@@ -139,6 +139,24 @@ jobs:
           echo "::set-output name=msi-sig-content::$MSI_SIG_CONTENT"
           echo "::set-output name=app-sig-content::$APP_SIG_CONTENT"
           echo "::set-output name=appimage-sig-content::$APPIMAGE_SIG_CONTENT"
+
+          MAC_UPDATE_FILE_PATH=$(find ./artifacts/ -type f -name "*.app.tar.gz" | head -n 1)
+          echo "::set-output name=mac_update_file_path::$MAC_UPDATE_FILE_PATH"
+
+          LINUX_UPDATE_FILE_PATH=$(find ./artifacts/ -type f -name "*.AppImage.tar.gz" | head -n 1)
+          echo "::set-output name=linux_update_file_path::$LINUX_UPDATE_FILE_PATH"
+
+          WINDOWS_UPDATE_FILE_PATH=$(find ./artifacts/ -type f -name "*.msi.zip" | head -n 1)
+          echo "::set-output name=windows_update_file_path::$WINDOWS_UPDATE_FILE_PATH"
+
+          MAC_FILE_PATH=$(find ./artifacts/ -type f -name "*.dmg" | head -n 1)
+          echo "::set-output name=mac_file_path::$MAC_FILE_PATH"
+
+          LINUX_FILE_PATH=$(find ./artifacts/ -type f -name "*.AppImage" | head -n 1)
+          echo "::set-output name=linux_file_path::$LINUX_FILE_PATH"
+
+          WINDOWS_FILE_PATH=$(find ./artifacts/ -type f -name "*.msi" | head -n 1)
+          echo "::set-output name=windows_file_path::$WINDOWS_FILE_PATH"
         working-directory: ${{ github.workspace }}
 
       - name: Generate Install JSON File
@@ -149,19 +167,19 @@ jobs:
             "platforms": {
               "darwin-x86_64": {
                 "signature": "${{ steps.sig-contents.outputs.app-sig-content }}",
-                "url": "${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/十贝.app.tar.gz"
+                "url": "${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.mac_update_file_path }}"
               },
               "darwin-aarch64": {
                 "signature": "${{ steps.sig-contents.outputs.app-sig-content }}",
-                "url": "${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/十贝.app.tar.gz"
+                "url": "${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.mac_update_file_path }}"
               },
               "linux-x86_64": {
                 "signature": "${{ steps.sig-contents.outputs.appimage-sig-content }}",
-                "url": "${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/十-贝_${{ steps.extract-version.outputs.version }}_amd64.AppImage.tar.gz"
+                "url": "${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.linux_update_file_path }}"
               },
               "windows-x86_64": {
                 "signature": "${{ steps.sig-contents.outputs.msi-sig-content }}",
-                "url": "${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/十贝_${{ steps.extract-version.outputs.version }}_x64_zh-CN.msi.zip"
+                "url": "${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.windows_update_file_path }}"
               }
             }
           }' > ./artifacts/install.json
@@ -194,22 +212,21 @@ jobs:
           content: |
             post:
               zh_cn:
-                title: 我是一个标题
+                title: 发现<测试环境>新版本${{ steps.extract-version.outputs.version }}
                 content:
                 - - tag: text
-                    un_escape: true
-                    text: '第一行&nbsp;:'
+                    text: 'Windows :'
                   - tag: a
-                    text: 超链接
-                    href: http://www.feishu.cn
-                  - tag: at
-                    user_id: ou_18eac85d35a26f989317ad4f02e8bbbb
+                    text: 下载
+                    href: ${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.windows_file_path }}
                 - - tag: text
-                    text: '第二行 :'
-                  - tag: text
-                    text: 文本测试
-                - - tag: img
-                    image_key: d640eeea-4d2f-4cb3-88d8-c964fab53987
-                    width: 300
-                    height: 300
+                    text: 'Mac :'
+                  - tag: a
+                    text: 下载
+                    href: ${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.mac_file_path }}
+                - - tag: text
+                    text: "Linux :"
+                  - tag: a
+                    text: 下载
+                    href: ${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.linux_file_path }}
 
