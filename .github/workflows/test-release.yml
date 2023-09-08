@@ -155,6 +155,9 @@ jobs:
           LINUX_FILE_PATH=$(find ./artifacts/ -type f -name "*.AppImage" -exec basename {} \; | head -n 1)
           echo "::set-output name=linux_file_path::$LINUX_FILE_PATH"
 
+          LINUX_FILE_DEB_PATH=$(find ./artifacts/ -type f -name "*.deb" -exec basename {} \; | head -n 1)
+          echo "::set-output name=linux_file_deb_path::$LINUX_FILE_DEB_PATH"
+
           WINDOWS_FILE_PATH=$(find ./artifacts/ -type f -name "*.msi" -exec basename {} \; | head -n 1)
           echo "::set-output name=windows_file_path::$WINDOWS_FILE_PATH"
         working-directory: ${{ github.workspace }}
@@ -225,8 +228,13 @@ jobs:
                     text: 下载
                     href: ${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.mac_file_path }}
                 - - tag: text
-                    text: "Linux :"
+                    text: "Linux AppImage :"
                   - tag: a
                     text: 下载
                     href: ${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.linux_file_path }}
+                - - tag: text
+                    text: "Linux Deb :"
+                  - tag: a
+                    text: 下载
+                    href: ${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.linux_file_deb_path }}
 
