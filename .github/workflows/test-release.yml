@@ -207,6 +207,10 @@ jobs:
           ossutil cp ./artifacts/install.json ${{ secrets.OSS_PATH }}/test-tauri/install.json --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com -f
           ossutil cp -r ./artifacts/${{ steps.extract-version.outputs.version }}/ ${{ secrets.OSS_PATH }}/test-tauri/${{ steps.extract-version.outputs.version }}/ --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com -f
 
+      - uses: geekyeggo/delete-artifact@v2
+        with:
+            name: artifacts
+
       - name: Push Message
         uses: foxundermoon/feishu-action@v2
         with:
