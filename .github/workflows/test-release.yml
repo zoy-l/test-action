@@ -15,9 +15,9 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - os: ubuntu-latest
-            rust_target: x86_64-unknown-linux-gnu
-            tauri_target: x86_64-unknown-linux-gnu
+          # - os: ubuntu-latest
+          #   rust_target: x86_64-unknown-linux-gnu
+          #   tauri_target: x86_64-unknown-linux-gnu
           - os: macos-latest
             rust_target: aarch64-apple-darwin
             tauri_target: universal-apple-darwin
@@ -231,14 +231,14 @@ jobs:
                   - tag: a
                     text: 下载
                     href: ${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.mac_file_path }}
-                - - tag: text
-                    text: "Linux AppImage :"
-                  - tag: a
-                    text: 下载
-                    href: ${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.linux_file_path }}
-                - - tag: text
-                    text: "Linux Deb :"
-                  - tag: a
-                    text: 下载
-                    href: ${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.linux_file_deb_path }}
+# - - tag: text
+#     text: "Linux AppImage :"
+#   - tag: a
+#     text: 下载
+#     href: ${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.linux_file_path }}
+# - - tag: text
+#     text: "Linux Deb :"
+#   - tag: a
+#     text: 下载
+#     href: ${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.linux_file_deb_path }}
 
