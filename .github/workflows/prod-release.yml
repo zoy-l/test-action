@@ -139,6 +139,27 @@ jobs:
           echo "::set-output name=msi-sig-content::$MSI_SIG_CONTENT"
           echo "::set-output name=app-sig-content::$APP_SIG_CONTENT"
           echo "::set-output name=appimage-sig-content::$APPIMAGE_SIG_CONTENT"
+
+          MAC_UPDATE_FILE_PATH=$(find ./artifacts/ -type f -name "*.app.tar.gz" -exec basename {} \; | head -n 1)
+          echo "::set-output name=mac_update_file_path::$MAC_UPDATE_FILE_PATH"
+
+          LINUX_UPDATE_FILE_PATH=$(find ./artifacts/ -type f -name "*.AppImage.tar.gz" -exec basename {} \; | head -n 1)
+          echo "::set-output name=linux_update_file_path::$LINUX_UPDATE_FILE_PATH"
+
+          WINDOWS_UPDATE_FILE_PATH=$(find ./artifacts/ -type f -name "*.msi.zip" -exec basename {} \; | head -n 1)
+          echo "::set-output name=windows_update_file_path::$WINDOWS_UPDATE_FILE_PATH"
+
+          MAC_FILE_PATH=$(find ./artifacts/ -type f -name "*.dmg" -exec basename {} \; | head -n 1)
+          echo "::set-output name=mac_file_path::$MAC_FILE_PATH"
+
+          LINUX_FILE_PATH=$(find ./artifacts/ -type f -name "*.AppImage" -exec basename {} \; | head -n 1)
+          echo "::set-output name=linux_file_path::$LINUX_FILE_PATH"
+
+          LINUX_FILE_DEB_PATH=$(find ./artifacts/ -type f -name "*.deb" -exec basename {} \; | head -n 1)
+          echo "::set-output name=linux_file_deb_path::$LINUX_FILE_DEB_PATH"
+
+          WINDOWS_FILE_PATH=$(find ./artifacts/ -type f -name "*.msi" -exec basename {} \; | head -n 1)
+          echo "::set-output name=windows_file_path::$WINDOWS_FILE_PATH"
         working-directory: ${{ github.workspace }}
 
       - name: Generate Install JSON File
@@ -149,19 +170,19 @@ jobs:
             "platforms": {
               "darwin-x86_64": {
                 "signature": "${{ steps.sig-contents.outputs.app-sig-content }}",
-                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/十贝.app.tar.gz"
+                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.mac_update_file_path }}"
               },
               "darwin-aarch64": {
                 "signature": "${{ steps.sig-contents.outputs.app-sig-content }}",
-                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/十贝.app.tar.gz"
+                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.mac_update_file_path }}"
               },
               "linux-x86_64": {
                 "signature": "${{ steps.sig-contents.outputs.appimage-sig-content }}",
-                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/十-贝_${{ steps.extract-version.outputs.version }}_amd64.AppImage.tar.gz"
+                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.linux_update_file_path }}"
               },
               "windows-x86_64": {
                 "signature": "${{ steps.sig-contents.outputs.msi-sig-content }}",
-                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/十贝_${{ steps.extract-version.outputs.version }}_x64_zh-CN.msi.zip"
+                "url": "${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.windows_update_file_path }}"
               }
             }
           }' > ./artifacts/install.json
@@ -183,6 +204,41 @@ jobs:
           ACCESS_KEY_ID: ${{ secrets.OSS_KEY }}
           ACCESS_KEY_SECRET: ${{ secrets.OSS_KEY_SECRET }}
         run: |
-          ossutil cp ./artifacts/install.json oss://shibei-file/tauri/install.json --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com -f
-          ossutil cp -r ./artifacts/${{ steps.extract-version.outputs.version }}/ oss://shibei-file/tauri/${{ steps.extract-version.outputs.version }}/ --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com -f
+          ossutil cp ./artifacts/install.json ${{ secrets.OSS_PATH }}/tauri/install.json --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com -f
+          ossutil cp -r ./artifacts/${{ steps.extract-version.outputs.version }}/ ${{ secrets.OSS_PATH }}/tauri/${{ steps.extract-version.outputs.version }}/ --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com -f
+
+      - uses: geekyeggo/delete-artifact@v2
+        with:
+            name: artifacts
+
+      - name: Push Message
+        uses: foxundermoon/feishu-action@v2
+        with:
+          url: ${{ secrets.FEISHU_BOT_WEBHOOK_URL }}
+          msg_type: post
+          content: |
+            post:
+              zh_cn:
+                title: 发现<生产环境>新版本${{ steps.extract-version.outputs.version }}
+                content:
+                - - tag: text
+                    text: 'Windows :'
+                  - tag: a
+                    text: 下载
+                    href: ${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.windows_file_path }}
+                - - tag: text
+                    text: 'Mac :'
+                  - tag: a
+                    text: 下载
+                    href: ${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.mac_file_path }}
+                - - tag: text
+                    text: "Linux AppImage :"
+                  - tag: a
+                    text: 下载
+                    href: ${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.linux_file_path }}
+                - - tag: text
+                    text: "Linux Deb :"
+                  - tag: a
+                    text: 下载
+                    href: ${{ secrets.OSS_URL }}/tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.linux_file_deb_path }}
 
