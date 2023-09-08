@@ -140,22 +140,22 @@ jobs:
           echo "::set-output name=app-sig-content::$APP_SIG_CONTENT"
           echo "::set-output name=appimage-sig-content::$APPIMAGE_SIG_CONTENT"
 
-          MAC_UPDATE_FILE_PATH=$(find ./artifacts/ -type f -name "*.app.tar.gz" | head -n 1)
+          MAC_UPDATE_FILE_PATH=$(find ./artifacts/ -type f -name "*.app.tar.gz" -exec basename {} \; | head -n 1)
           echo "::set-output name=mac_update_file_path::$MAC_UPDATE_FILE_PATH"
 
-          LINUX_UPDATE_FILE_PATH=$(find ./artifacts/ -type f -name "*.AppImage.tar.gz" | head -n 1)
+          LINUX_UPDATE_FILE_PATH=$(find ./artifacts/ -type f -name "*.AppImage.tar.gz" -exec basename {} \; | head -n 1)
           echo "::set-output name=linux_update_file_path::$LINUX_UPDATE_FILE_PATH"
 
-          WINDOWS_UPDATE_FILE_PATH=$(find ./artifacts/ -type f -name "*.msi.zip" | head -n 1)
+          WINDOWS_UPDATE_FILE_PATH=$(find ./artifacts/ -type f -name "*.msi.zip" -exec basename {} \; | head -n 1)
           echo "::set-output name=windows_update_file_path::$WINDOWS_UPDATE_FILE_PATH"
 
-          MAC_FILE_PATH=$(find ./artifacts/ -type f -name "*.dmg" | head -n 1)
+          MAC_FILE_PATH=$(find ./artifacts/ -type f -name "*.dmg" -exec basename {} \; | head -n 1)
           echo "::set-output name=mac_file_path::$MAC_FILE_PATH"
 
-          LINUX_FILE_PATH=$(find ./artifacts/ -type f -name "*.AppImage" | head -n 1)
+          LINUX_FILE_PATH=$(find ./artifacts/ -type f -name "*.AppImage" -exec basename {} \; | head -n 1)
           echo "::set-output name=linux_file_path::$LINUX_FILE_PATH"
 
-          WINDOWS_FILE_PATH=$(find ./artifacts/ -type f -name "*.msi" | head -n 1)
+          WINDOWS_FILE_PATH=$(find ./artifacts/ -type f -name "*.msi" -exec basename {} \; | head -n 1)
           echo "::set-output name=windows_file_path::$WINDOWS_FILE_PATH"
         working-directory: ${{ github.workspace }}
 
