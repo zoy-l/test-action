@@ -183,6 +183,33 @@ jobs:
           ACCESS_KEY_ID: ${{ secrets.OSS_KEY }}
           ACCESS_KEY_SECRET: ${{ secrets.OSS_KEY_SECRET }}
         run: |
-          ossutil cp ./artifacts/install.json oss://shibei-file/test-tauri/install.json --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com -f
-          ossutil cp -r ./artifacts/${{ steps.extract-version.outputs.version }}/ oss://shibei-file/test-tauri/${{ steps.extract-version.outputs.version }}/ --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com -f
+          ossutil cp ./artifacts/install.json ${{ secrets.OSS_PATH }}/test-tauri/install.json --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com -f
+          ossutil cp -r ./artifacts/${{ steps.extract-version.outputs.version }}/ ${{ secrets.OSS_PATH }}/test-tauri/${{ steps.extract-version.outputs.version }}/ --access-key-id=$ACCESS_KEY_ID --access-key-secret=$ACCESS_KEY_SECRET --endpoint=oss-cn-hangzhou.aliyuncs.com -f
+
+      - name: Push Message
+        uses: foxundermoon/feishu-action@v2
+        with:
+          url: ${{ secrets.FEISHU_BOT_WEBHOOK_URL }}
+          msg_type: post
+          content: |
+            post:
+              zh_cn:
+                title: 我是一个标题
+                content:
+                - - tag: text
+                    un_escape: true
+                    text: '第一行&nbsp;:'
+                  - tag: a
+                    text: 超链接
+                    href: http://www.feishu.cn
+                  - tag: at
+                    user_id: ou_18eac85d35a26f989317ad4f02e8bbbb
+                - - tag: text
+                    text: '第二行 :'
+                  - tag: text
+                    text: 文本测试
+                - - tag: img
+                    image_key: d640eeea-4d2f-4cb3-88d8-c964fab53987
+                    width: 300
+                    height: 300
 
