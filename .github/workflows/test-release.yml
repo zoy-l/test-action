@@ -237,4 +237,7 @@ jobs:
                   - tag: a
                     text: 下载
                     href: ${{ secrets.OSS_URL }}/test-tauri/${{ steps.extract-version.outputs.version }}/${{ steps.sig-contents.outputs.linux_file_deb_path }}
+                - - tag: at
+                    user_id: all
+                    user_name: '所有人'
 
